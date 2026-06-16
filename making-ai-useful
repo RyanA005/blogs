@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Making-AI-Useful</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #111;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 28px 18px 70px;
+    }
+
+    a {
+      color: #111;
+      text-decoration: underline;
+    }
+
+    h1, h2, h3 {
+      font-weight: normal;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.1;
+      margin-top: 18px;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-top: 34px;
+      margin-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin-top: 8px;
+      margin-bottom: 14px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #111;
+      margin: 24px 0;
+    }
+
+    blockquote {
+      margin: 18px 0;
+      padding-left: 14px;
+      border-left: 3px solid #111;
+      font-style: italic;
+    }
+
+    code {
+      background: #eee;
+      padding: 1px 4px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+    }
+
+    pre {
+      background: #eee;
+      padding: 12px;
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    .topnav {
+      margin-bottom: 20px;
+    }
+
+    .date {
+      color: #555;
+      margin-bottom: 18px;
+    }
+
+    .note {
+      background: #f4f4f4;
+      padding: 12px;
+      margin: 16px 0;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .box {
+      border: 1px solid #111;
+      padding: 12px;
+      margin: 12px 0;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #555;
+    }
+
+    @media (max-width: 650px) {
+      .two-col {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="topnav">
+      <a href="/">home</a> / <a href="/blog">blog</a>
+    </div>
+
+    <hr>
+
+    <h1>Making AI coding tools useful</h1>
+    <p class="date">Brief notes on Claude Code reliability, use in healthcare related software, good practice, and the gap between demos and usable code</p>
+
+    <p>
+      AI coding tools are good enough to be useful, I don't think that is a question at all.
+    </p>
+
+    <p>
+      The actual question is how to make them reliable enough to use to their maximum capacity in the real world, especially concerning work with EHR records, production code, or communications with real humans.
+	  We need to consider how to avoid wasting time, generating garbage, or making a mess out of existing systems.
+    </p>
+
+    <p>
+      The common failiure modes look something like this:
+    </p>
+
+    <blockquote>
+      It does 90% of the work, then chases its tail for an hour trying to solve what should be a very simple issue.
+    </blockquote>
+
+    <blockquote>
+      The code works great, but it's a thousand line script that no one is possibly reading or maintaining.
+    </blockquote>
+
+    <blockquote>
+      This generated email/landing page/documentation/whatever is full of BS and sounds like it was copied right from ChatGPT.
+    </blockquote>
+
+    <blockquote>
+      Trying to use AI in an existing codebase and it's touching things it shouldn't and making a mess.
+    </blockquote>
+
+    <blockquote>
+      Just playing around with the new Claude I spent $70 in three hours (true story).
+    </blockquote>
+
+    <hr>
+
+    <h2>1. Reliability</h2>
+
+    <p>
+      Claude likes to start by generating massive amounts of generally pretty good code. Boilerplate is easy, but often it hits a wall, then starts screwing around.
+    </p>
+
+    <p>
+      The pattern is:
+    </p>
+
+    <ol>
+      <li>solve most of the task.</li>
+      <li>one small issue remains.</li>
+      <li>start aggressively patching.</li>
+      <li>the patches create new problems.</li>
+      <li>the session quickly gets worse.</li>
+    </ol>
+
+    <p>
+      This really sucks because the last 10% ends up eating all of the time the first 90% saved.
+    </p>
+
+    <h3>How do we fix it?</h3>
+    <p>
+      A huge ROI change is to write repo-specific rules. Claude Code will find these in a file called CLAUDE.md, Cursor will look for project rules in .cursor/rules, AGENTS.md is an open standard, consult the docs of your agent of choice.</p>
+    <p>
+	There are a million good examples online of what to include and what not to include. <a href="https://agents.md/">[1]</a>, <a href="https://code.claude.com/docs/en/memory">[2]</a>, <a href="https://cursor.com/docs/rules">[3]</a>.
+    </p>
+    <p>
+	I start with a template file which outlines general good practice and preferences, then add project particulars, things like architecture decisions, UI standards, language/tool preferences, style, etc. 
+    </p>
+    <p>
+	  After you have some hand written rules it is useful to ask your agent to review and update those rules itself. You can even add a rule to update the rules at any given checkpoint.
+    </p>
+    <p>
+	  Rules are what keep agents from going off the deep end when things go unexpectedly. Whenever an agent misbehaves, or does something I don't like, I will solve the issue, then ask it to explain its fault and what things triggered it, then write a new rule to ensure the breakdown never repeats.
+    </p>
+    <p>
+	  Claude Code has a command /init which you can use in an existing codebase to map the current architecture and design, then write appropriate rules to enforce the standard as Claude continues.
+    </p>
+
+    <pre><code># example rules file
+
+- propose a short plan before making changes and ask clarifying questions when unsure
+- follow the existing architecture and design patterns
+- do not create giant single-file implementations
+- do not touch files X,Y,Z, and do not make any database migrations
+- add or update tests when behavior changes
+- if stuck after two failed attempts, stop and explain the blocker</code></pre>
+
+    <p>
+	  Treat it like an intern, it doesn't know that there are any rules unless you tell it. You can't blame the poor thing, it learned all its manners from the internet.
+	</p>
+
+    <hr>
+
+    <h2>2. Reviewability</h2>
+
+    <p>
+      A 1000 line bash script may run but it is probably not a useful piece of engineering that anyone can be expected to maintain or fix.
+    </p>
+
+    <p>
+      Bad AI output often looks like:
+    </p>
+
+    <ul>
+      <li>huge diffs</li>
+      <li>no tests</li>
+      <li>no docs</li>
+      <li>one big file</li>
+      <li>new patterns invented for no reason</li>
+      <li>changes and side effects all over the place</li>
+    </ul>
+
+    <h3>How do I avoid that?</h3>
+    <p>
+	  Understand that Claude doesn't care about architecture or maintainability or reviewers unless you tell it to. Explaining your expectations for the final state of the codebase will nearly eliminate the entire issue.
+    </p>
+    <p>
+	There are a few super useful skills here to point your agent in the right direction from the start with only a little bit more setup required.
+	</p>
+	<p>Most agents now have a built in planning mode or planning workflow. This allows you to generate a document containing all the design decisions you want made. I find it useful to ask the agent to end its plan with a granular todo list for it to follow. You can employ some specific phrasing like "write as many todos as you possibly need" to get Claude or Cursor to spit out a list of dozens of items encompassing everything from setting up, to actually writing, to reviewing, testing, documenting, etc.
+	</p>
+	<p>There are also some great community skills for planning, I really like the super simple Claude skill <a href="https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md">grill-me</a>. The purpose is stated to be to "reach a shared understanding" with the model which is nicely said but in practice, Claude will just ask you a bunch of questions. The less inferring you let an agent do, the better it's going to be.
+    </p>
+    <p>
+	  If you just tell AI to get it done, it will just get it done. If you spend a little more time telling it how you want it done, it will do that too. Leverage its good listening skills before it makes a mess.
+    </p>
+
+    <hr>
+
+    <h2>3. Context management and drift</h2>
+
+    <p>
+	<a href="https://arxiv.org/abs/2605.12366">Context rot</a> is an interesting concept that has implications in how the LLM itself performs as well as how the agent is able to work. The idea is that the more tokens you send off to an LLM, the more math it needs to do to generate more tokens. You can imagine that something you said 1000 words ago is not as important as what you said 2 words ago however the model must still consider both words for every new token it generates. It gets slower and actually dumber.
+    </p>
+    <p>
+      As far as the agent is concerned, the LLM is the engine, dumber and slower LLM is dumber and slower agent. But even before the actual LLM performance drops, the agent loses effectiveness because it remembers all its failed attempts, assumptions, old plans, irrelevant code and files. Why are we wasting energy remembering work we did that was wrong or so old it is irrelevant?
+    </p>
+	<p>
+	  Nice visual: <a href="https://www.trychroma.com/research/context-rot
+">here</a> 
+	</p>
+
+    <h3>What are the options?</h3>
+    <p>
+	  The person who solves this problem for good and enables us to have infinite context will be a billionaire and win a Nobel Prize but at this moment we resort to one of the following:
+    </p>
+	<ol>
+	  <li>just ignore it (don't do this)</li>
+	  <li>compact your current context</li>
+	  <li>start a fresh session</li>
+	</ol>
+
+    <div class="two-col">
+      <div class="box">
+        <p><b>compact when</b></p>
+        <ul>
+          <li>you are in the middle of one task</li>
+          <li>the current plan still makes sense</li>
+          <li>the model has not repeatedly failed</li>
+          <li>the context is mostly relevant</li>
+        </ul>
+      </div>
+
+      <div class="box">
+        <p><b>start over when</b></p>
+        <ul>
+          <li>Claude has tried multiple bad fixes</li>
+          <li>the original goal is buried</li>
+          <li>the next step is really a new task</li>
+          <li>the session is full of failed attempts</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>
+	  knowing exactly when to compact is also important, Claude Code can compact context, and Cursor also has built-in context management. A decent practical standard is to start thinking about compaction well before the limit, around 60% of your context window. The /context command in Claude Code shows an exact breakdown of what's in your context, Cursor has a built in graph, and there are community made plugins for better visuals or proactive or theoretically better compaction. I find the default ones to be pretty solid.
+	</p>
+	<p>
+	  One cool trick in Claude Code is you can use the /compact command with an argument like "save everything related to database", this does exactly what it sounds like, you can choose roughly what things to compact and what things to keep in context.
+    </p>
+	<p>
+	  My recommendation is to start fresh as often as possible, only compact if you are mid task. An alternative I sometimes use is to ask "give me a summary of the last 5 changes to pass to a second coding agent" then I start a fresh agent and paste that summary right in.
+    </p>
+	<p>
+	  The idea is to always be giving the agent exactly what it needs. Too little, it's going to make things up, too much, it gets sloppy.
+    </p>
+
+    <hr>
+
+    <h2>4. Cost</h2>
+
+    <p>
+	  Cost is one of the most interesting areas where there are lots of improvements to be made. I doubt this is the current case but there are teams spending millions of dollars monthly on tokens and I would bet they are doing something wrong.
+    </p>
+
+    <h3>What we can do</h3>
+    <p>
+	I already employ my own system to route simpler requests to smaller cheaper models like <a href="https://openrouter.ai/moonshotai/kimi-k2.5">Kimi K2.5</a> or <a href="https://openrouter.ai/deepseek/deepseek-v4-flash">DeepSeek V4 Flash</a>. For things like web search, summarization, or simple boilerplate, these models are marginally dumber for fractions of the cost of even the cheapest Claude models.
+    </p>
+    <p>
+	  If cost is a concern there are a list of measures to reduce it, prompting better, using cheaper models, clearing/compacting frequently, installing plugins that do things such as sending less verbose bash outputs to agents. This is a rabbit hole which I have been down before and I can go down again.
+    </p>
+
+    <div class="box">
+      <p><b>small models</b></p>
+      <p>summaries, simple reviews, formatting, context cleanup, lightweight tool calls, docs cleanup</p>
+    </div>
+
+    <div class="box">
+      <p><b>big models</b></p>
+      <p>implementation, hard debugging, architecture decisions, security review, difficult refactors</p>
+    </div>
+
+    <p>
+      You can save a lot by truncating what you send to the model, and choosing the right model for the job.
+    </p>
+
+    <hr>
+
+    <h2>5. When to not use AI</h2>
+
+    <p>
+	  There are some tasks that are simply not fit for AI either for safety, capability, or authenticity reasons.
+    </p>
+
+    <div class="two-col">
+      <div class="box">
+        <p><b>good uses</b></p>
+        <ul>
+          <li>regular coding tasks</li>
+          <li>summarizing docs</li>
+          <li>drafting communications</li>
+          <li>reviewing non-sensitive data</li>
+        </ul>
+      </div>
+
+      <div class="box">
+        <p><b>definitely not</b></p>
+        <ul>
+          <li>sending your boss or clients an email</li>
+          <li>running commands unsupervised</li>
+          <li>making UI/UX desciscions without humans</li>
+          <li>accessing PII or PHI</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>What I would do</h3>
+    <p>
+	  I would start by reviewing current usage. Agents should be running in sandboxes and never on production servers. I would look into tools which run locally to catch PII or other sensitive credentials before you send them off to LLMs. I would also advise caution from developers when using AI in general for all those important things from code to writing emails. At the end of the day, a human needs to know they are responsible for anything they push or send, whether an LLM wrote it or they did.
+    </p>
+
+    <hr>
+
+
+    <h2>Where will I start?</h2>
+
+    <p>
+	  In my opinion, the reliability issues are the most pressing. No point optimizing costs if it's all junk anyway.
+    </p>
+
+    <p>
+	  Order of operations looks something like this to me:
+    </p>
+
+    <ul>
+	  <li>company AI mapping/standards<ul>
+		<li>what is everyone using already?</li>
+		<li>have I correctly identified all the issues?</li>
+		<li>what other concerns should I be looking into?</li></ul>
+	  </li>
+
+	  <li>repo-specific <code>CLAUDE.md</code> files<ul>
+		<li>create a company standard template rules file</li>
+		<li>A/B test and benchmark with and without rule guidance</li>
+		<li>create a system for creating new rules in existing or new repos</li></ul>
+	  </li>
+	  <li>reusable prompts and commands<ul>
+		<li>build a custom command/skill list for common workflows</li>
+		<li>define and document reusable review, debug, PR prompts</li>
+		<li>write a nice cheatsheet for how to use these things to the max</li></ul>
+	  </li>
+      <li>context management rules/guide<ul>
+		<li>choose or build specific context management skills and plugins</li></ul>
+	  </li>
+      <li>review tools<ul>
+		<li>build dedicated review agents or prompt based review pipelines</li>
+		<li>ensure agents explain and justify their changes before PR</li></ul>
+	  </li>
+      <li>healthcare safety boundaries<ul>
+		<li>create rules for humans to ensure that sensitive data is never sent off to AI</li>
+		<li>build or deploy existing local tool to prevent PII data from being pasted into agent interfaces</li></ul>
+	  </li>
+      <li>selective model routing for cost savings<ul>
+		<li>employ cheap API for simple requests and deploy a router in Claude Code</li>
+		<li>develop a cost saving plugin list</li>
+		<li>benchmark savings</li></ul>
+	  </li>
+    </ul>
+
+    <p>
+	  Once we have a reliable and convincing pipeline for safe and useful AI, then we can talk about optimizing our use. Things like subagents, autonomous review, agents who do whatever, anything is possible!
+    </p>
+
+    <hr>
+
+    <h2>Some resources:</h2>
+	<h3>Research and benchmarks</h3>
+	<ul>
+	  <li><a href="https://arxiv.org/abs/2405.15793">SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering</a></li>
+	  <li><a href="https://arxiv.org/abs/2401.07339">CodeAgent: Enhancing Code Generation with Tool-Integrated Agent Systems</a></li>
+	  <li><a href="https://www.swebench.com/verified.html">SWE-bench Verified</a></li>
+	  <li><a href="https://arxiv.org/abs/2206.15000">Grounded Copilot: How Programmers Interact with Code-Generating Models</a></li>
+	  <li><a href="https://www.trychroma.com/research/context-rot">Context Rot: How Increasing Input Tokens Impacts LLM Performance</a></li>
+	  <li><a href="https://github.com/chroma-core/context-rot">Context Rot replication repo</a></li>
+	</ul>
+
+	<h3>Security and healthcare safety</h3>
+	<ul>
+	  <li><a href="https://arxiv.org/abs/2601.10004">SoK: Privacy-aware LLM in Healthcare</a></li>
+	  <li><a href="https://arxiv.org/abs/2511.11347">Privacy Challenges and Solutions in RAG-Enhanced LLMs for Healthcare</a></li>
+	  <li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP Top 10 for Large Language Model Applications</a></li>
+	  <li><a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf">NIST AI Risk Management Framework: Generative AI Profile</a></li>
+	</ul>
+
+	<h3>Agent workflows and tools</h3>
+	<ul>
+	  <li><a href="https://agents.md/">AGENTS.md</a></li>
+	  <li><a href="https://code.claude.com/docs/en/memory">Claude Code memory / CLAUDE.md docs</a></li>
+	  <li><a href="https://cursor.com/docs/rules">Cursor rules docs</a></li>
+	</ul>
+
+	<h3>Videos</h3>
+	<ul>
+	  <li><a href="https://www.youtube.com/watch?v=v4F1gFy-hqg">Software Fundamentals Matter More Than Ever - Matt Pocock</a></li>
+	  <li><a href="https://youtu.be/96jN2OCOfLs?si=GdMtiD7TXQPEiQJG">Andrej Karpathy: From Vibe Coding to Agentic Engineering</a></li>
+	  <li><a href="https://youtu.be/RjfbvDXpFls?si=VAqiqVYnvCPJodYe">Building pi in a World of Slop - Mario Zechner</a></li>
+	  <li><a href="https://youtu.be/2CpSjoNCKxo?si=x9YCsS2cp7V0dUpC">Agents and Tools - Ryan Alport</a></li>
+	</ul>
+
+    <hr>
+
+    <p class="small">
+      <a href="/">back home</a>
+    </p>
+  </main>
+</body>
+</html>

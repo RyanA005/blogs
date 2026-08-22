@@ -1,0 +1,17 @@
+{
+  "grid": [
+    72,
+    70
+  ],
+  "channels": 16,
+  "hidden": 128,
+  "experiment": "regenerating",
+  "target": "assets\\logo_badge.png",
+  "pad": 16,
+  "seed_yx": [
+    31,
+    28
+  ],
+  "step": 7100,
+  "loss": 0.001593035296536982
+}

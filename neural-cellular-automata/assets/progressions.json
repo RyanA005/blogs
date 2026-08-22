@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "grid": [
+      88,
+      48
+    ],
+    "channels": 16,
+    "hidden": 128,
+    "experiment": "regenerating",
+    "target": "assets\\logo_computer_only.png",
+    "pad": 16,
+    "seed_yx": [
+      18,
+      42
+    ],
+    "step": 8000,
+    "loss": 0.0028141166549175978
+  },
+  "best_loss": 0.0005783087690360844,
+  "best_step": 28,
+  "live": [
+    {
+      "step": 4000,
+      "loss": 0.0025289026089012623,
+      "src": "assets/word_s4000_t.png"
+    },
+    {
+      "step": 5000,
+      "loss": 0.003319712821394205,
+      "src": "assets/word_s5000_t.png"
+    },
+    {
+      "step": 6000,
+      "loss": 0.0022276416420936584,
+      "src": "assets/word_s6000_t.png"
+    },
+    {
+      "step": 7000,
+      "loss": 0.003290163353085518,
+      "src": "assets/word_s7000_t.png"
+    },
+    {
+      "step": 8000,
+      "loss": 0.0028141166549175978,
+      "src": "assets/word_s8000_t.png"
+    }
+  ]
+}

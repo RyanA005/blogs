@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>neural automata logo</title>
+  <style>
+    :root {
+      --bg: #0c1218;
+      --fg: #e6edf5;
+      --muted: #7a8799;
+      --accent: #5ec8d8;
+      --accent2: #e8a07a;
+      --card: #141c26;
+      --border: #243040;
+      --code-bg: #0a1016;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(94, 200, 216, 0.08), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(232, 160, 122, 0.06), transparent 50%),
+        var(--bg);
+      color: var(--fg);
+      font-family: "Source Code Pro", "IBM Plex Mono", "Consolas", "Courier New", monospace;
+      font-size: 15px;
+      line-height: 1.75;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    .wrap { max-width: 740px; margin: 0 auto; }
+
+    .back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      display: inline-block;
+      margin-bottom: 2.5rem;
+    }
+    .back:hover { color: var(--accent); }
+
+    h1 {
+      font-size: clamp(1.55rem, 5vw, 2.15rem);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+    h2 {
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--accent);
+      margin: 2rem 0 0.75rem;
+      text-transform: lowercase;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--fg);
+      margin: 1.75rem 0 0.5rem;
+      text-transform: lowercase;
+    }
+
+    p { margin-bottom: 1rem; }
+
+    a { color: var(--accent2); }
+    a:hover { text-decoration: none; }
+
+    em { color: var(--muted); font-style: normal; }
+
+    .figure {
+      background: var(--card);
+      border: 1px solid var(--border);
+      margin: 1.75rem 0;
+      overflow: hidden;
+    }
+
+    .figure img, .figure svg {
+      display: block;
+      width: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .figure.diagram img,
+    .figure .chart-wrap img {
+      image-rendering: auto;
+    }
+
+    .figure.diagram {
+      background: #121820;
+    }
+
+    .figure.diagram img {
+      padding: 0.25rem 0.5rem 0.5rem;
+    }
+
+    .figure.hero-demo {
+      width: 100%;
+      background: #f2f2f0;
+    }
+
+    .figure.hero-demo .ca-wrap {
+      width: 100%;
+      aspect-ratio: 72 / 70;
+      position: relative;
+      overflow: hidden;
+      background: #f2f2f0;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .figure.hero-demo canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .figure.hero-demo .caption {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+    }
+
+    .caption {
+      padding: 0.5rem 0.75rem;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* 3-step horizontal progressions */
+    .progress {
+      background: var(--card);
+      border: 1px solid var(--border);
+      margin: 1.25rem 0;
+      padding: 0.85rem 0.75rem 0.7rem;
+    }
+
+    .progress-title {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: lowercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      flex-wrap: nowrap;
+    }
+
+    .progress-step {
+      flex: 1 1 0;
+      max-width: 118px;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .progress-step img {
+      display: block;
+      width: 100%;
+      max-width: 110px;
+      max-height: 58px;
+      margin: 0 auto;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+
+    .progress-meta {
+      margin-top: 0.35rem;
+      font-size: 9.5px;
+      line-height: 1.3;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-meta .step {
+      color: var(--fg);
+      display: block;
+    }
+
+    .progress-meta .loss {
+      color: var(--accent2);
+      display: block;
+    }
+
+    .progress-arrow {
+      flex: 0 0 auto;
+      color: var(--accent);
+      font-size: 0.95rem;
+      padding: 0 0.05rem;
+      margin-bottom: 1.25rem;
+      user-select: none;
+    }
+
+    @media (max-width: 640px) {
+      .progress-row {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 0.25rem;
+      }
+      .progress-step { flex: 0 0 96px; max-width: 96px; }
+      .progress-step img { max-width: 88px; max-height: 48px; }
+    }
+
+    .chart-wrap {
+      padding: 0.75rem 0.5rem 0.25rem;
+      overflow-x: auto;
+    }
+
+    .chart-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0.75rem 1rem 0;
+      text-transform: lowercase;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      font-size: 12.5px;
+      line-height: 1.6;
+      margin: 1.25rem 0;
+    }
+
+    code { font-family: inherit; font-size: 0.92em; }
+
+    p code, li code {
+      background: var(--code-bg);
+      padding: 0.1em 0.35em;
+      border: 1px solid var(--border);
+    }
+
+    ul, ol { margin: 0 0 1rem 1.25rem; }
+    li { margin-bottom: 0.35rem; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      margin: 1.25rem 0;
+      min-width: 480px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.5rem;
+      text-align: left;
+    }
+    th { color: var(--muted); font-weight: 400; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr.highlight td { background: rgba(94, 200, 216, 0.07); }
+
+    .footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .figure.figure-row img {
+      max-height: 64px;
+      width: auto;
+      margin: 0.75rem auto;
+      background: #fff;
+    }
+
+    .failure-master {
+      margin: 1.25rem 0 1.5rem;
+      background: #f2f2f0;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .failure-master img {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="https://ryanhub.org/">&lt;- back to ryanhub</a>
+
+    <h1>growing a neural logo</h1>
+    <p class="subtitle">recreating Distill's Growing Neural Cellular Automata for the <a href="https://iheartcomputer.club">computer club</a> website</p>
+    <div class="figure hero-demo">
+      <div class="ca-wrap">
+        <canvas id="blog-ca-hero" aria-label="growing neural cellular automata logo demo"></canvas>
+      </div>
+    </div>
+
+    <h2>the question</h2>
+    <p>
+      can a tiny neural cellular automaton grow the computer club club logo from a single seed cell,
+      then keep it alive and repair it in the browser?
+    </p>
+    <p>
+      treat this page is a lab notebook. I made some creative tweaks to the original but refer to the paper for the original intuition behind these models.
+    </p>
+
+    <hr>
+
+    <h2>our inspiration</h2>
+    <p>
+      <a href="https://distill.pub/2020/growing-ca/">Growing Neural Cellular Automata</a>
+      (Mordvintsev, Randazzo, Niklasson, Levin; Distill, 2020) is the paper that
+      replaces the handwritten rule with a trainable one and shows emoji growing,
+      persisting, and regenerating. I implement a very similar model for the club logo
+      each cell is a 16-d vector. perception is the fixed 3×3 Sobel stack;
+      a tiny MLP proposes a state delta; stochastic per-cell updates (fire rate 0.5)
+      and an alpha-based living mask.
+    </p>
+    <p>three parts to their method:</p>
+    <ul>
+      <li><strong>growing</strong> · start from a seed, unroll N~U{64,96} steps, L2 on RGBA</li>
+      <li><strong>persistent</strong> · sample pool so the pattern stays stable past the unroll</li>
+      <li><strong>regenerating</strong> · same pool, plus circular damage so it learns to heal</li>
+    </ul>
+    <p>we will follow their experiments closely but you will see some parts where we must diverge</p>
+
+    <h2>cellular automata, briefly</h2>
+    <p>
+      a cellular automaton is a grid of cells.
+      each discrete time step, every cell looks at just its neighborhood,
+      applies the update rule, and transfers to a new state. no cell talks to
+      distant cells directly; all patterns come from simple rules
+    </p>
+    <p>
+    in the classic kind, rules are hand written. <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's Game of Life</a>
+      is the most famous example: a live cell survives with 2–3 live neighbors; a dead cell
+      births with exactly 3. the rules are simple yet they produce complex structures
+    </p>
+    <p>
+      growing neural CA keeps the spirit but changes the rules. instead of boolean logic
+      each cell runs a tiny neural network to decide its state.
+      training finds the weights so that this network will produce a certain pattern.
+    </p>
+
+    <h2>model recipe</h2>
+    <p>
+      we will roughly copy Distill here, making some tweaks to accomodate my desktop 1660ti
+    </p>
+      <table>
+        <tbody>
+          <tr><td>channels / hidden</td><td class="num">16 / 128</td></tr>
+          <tr><td>CA steps</td><td class="num">64–96</td></tr>
+          <tr><td>fire rate</td><td class="num">0.5</td></tr>
+          <tr><td>optimizer</td><td>Adam, betas (0.5, 0.5)</td></tr>
+          <tr><td>LR</td><td>2e-3 → 2e-4 after milestone</td></tr>
+          <tr><td>grad handling</td><td>per-param L2 normalize</td></tr>
+          <tr><td>loss</td><td>pixel L2 (optional L1 / text-boost)</td></tr>
+          <tr><td>seed</td><td>opaque COM (prefer non-red)</td></tr>
+        </tbody>
+      </table>
+    <hr>
+
+    <h2>architecture basics</h2>
+    <p>
+      every grid cell holds a 16-vector: RGBA plus hidden state.
+      each step, all cells run the same small network: 3×3 perception (identity + Sobel),
+      128-d ReLU hidden layer, 16-d delta. stochastic fire rate 0.5 and an alpha-based
+      alive mask.
+    </p>
+    <div class="figure diagram">
+      <img src="neural-cellular-automata/assets/diagram_ca_cell.svg" alt="diagram: one CA cell perception and MLP update">
+    </div>
+
+    <h3>training vs inference</h3>
+    <p>
+      <strong>training</strong> unrolls the CA for a random number of steps (64–96 at emoji scale;
+      80–112 for my HD targets), compares rendered RGBA to a target image, backprops through
+      the unroll, and normalizes each parameter gradient to unit L2 norm (Distill uses this trick for stability).
+      persistent and regenerating experiments add a sample pool and optional circular damage.
+    </p>
+    <div class="figure diagram">
+      <img src="neural-cellular-automata/assets/diagram_training.svg" alt="diagram: training loop with pool and loss">
+    </div>
+    <p>
+      <strong>inference</strong> loads the same weights (uint8 quantized for WebGL), places one seed cell,
+      and keeps calling <code>step()</code>.
+    </p>
+    <hr>
+
+    <h2>architecture and training recipe</h2>
+    <p>
+      I stayed close to Distill: 16 channels, 128 hidden, fire rate 0.5,
+      Adam with betas (0.5, 0.5), per-parameter grad L2 normalize
+      LR 2e-3 then dropping by a power of ten after a few thousand steps.
+    </p>
+
+<pre>perception = concat(identity, sobel_x, sobel_y)   # 48-d
+hidden     = relu(perception @ W1 + b1)           # 128
+delta      = hidden @ W2 + b2                     # 16
+alive      = maxpool(alpha) &gt; 0.1
+update     = state + fire_mask * alive * delta
+</pre>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th colspan="3">model size</th></tr>
+          <tr><th>artifact</th><th>bytes</th><th>notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>learned scalars</td><td class="num">8,320</td><td>fc0 6,144 + bias 128; fc1 2,048</td></tr>
+          <tr><td>float32 weights</td><td class="num">33,280</td><td>8,320 × 4 B</td></tr>
+          <tr><td>model.pth</td><td class="num">34,886</td><td>PyTorch checkpoint on disk</td></tr>
+          <tr class="highlight"><td>WebGL JSON</td><td class="num">11,521</td><td>uint8-quantized bundle for the browser</td></tr>
+          <tr><td>decoded payload</td><td class="num">8,336</td><td>weight bytes after base64 decode</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th colspan="3">compute per phase (MAC = Multiply Accumulate)</th></tr>
+          <tr><th>phase</th><th>MACs</th><th>notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>one CA step</td><td class="num">43.2M</td><td>4,960 cells on 80×62 grid</td></tr>
+          <tr><td>↳ perception</td><td class="num">2.1M</td><td>three grouped 3×3 Sobel convs</td></tr>
+          <tr><td>↳ MLP</td><td class="num">40.6M</td><td>48→128→16 per cell</td></tr>
+          <tr><td>↳ life + fire gate</td><td class="num">~0.4M</td><td>maxpool mask, stochastic update</td></tr>
+          <tr><td>inference unroll</td><td class="num">3.5B</td><td>80 steps, batch 1, seed → logo</td></tr>
+          <tr><td>live demo frame</td><td class="num">86M</td><td>2 CA steps per animation frame</td></tr>
+          <tr><td>training forward</td><td class="num">28B</td><td>batch 8 × ~80 CA steps</td></tr>
+          <tr><td>training total</td><td class="num">84B</td><td>forward + backward through unroll (~3×)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr>
+
+    <h2>failures</h2>
+    <p>
+      the following are just a few neat outputs, we saw a variety of failures all to be discussed in the next sections.
+    </p>
+
+    <figure class="failure-master">
+      <img src="neural-cellular-automata/assets/failure/master.gif" alt="failure mode rollouts">
+    </figure>
+
+    <hr>
+
+    <h2>progression</h2>
+
+    <h3>1 · naive "just train the logo"</h3>
+    <p>
+      my first instinct was to dump the logo into the trainer and wait.
+      if only it was that easy... 
+      the target was too big for a 64–96 step unroll. 
+      MSE loved the red heart and treated the thin black letters as optional. 
+      the gaps were feeling so impossible to close we introduced a manual white gap
+    </p>
+
+    <div class="figure">
+      <img src="neural-cellular-automata/assets/early_noise.png" alt="early failed growth looking like noise">
+    </div>
+    <p>
+      clearly we needed to think a little harder about this.
+    </p>
+
+    <h3>2 · shrink the target</h3>
+    <p>
+      I should not have wasted a single GPU FLOP before doing this... 
+      I cut down to a 48×30 two-line badge and instantly fixed the "cannot finish growing" problem.
+      the heart locked in by step ~500 and the word spent thousands of steps as a smear.
+      the issue was that loss looked great but the logo looked terrible.
+    </p>
+
+    <div class="progress">
+      <div class="progress-row">
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_s0500_t.png" alt="badge step 500">
+          <div class="progress-meta">
+            <span class="step">step 500</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_s1000_t.png" alt="badge step 1000">
+          <div class="progress-meta">
+            <span class="step">step 1000</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_s1500_t.png" alt="badge step 1500">
+          <div class="progress-meta">
+            <span class="step">step 1500</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_s2000_t.png" alt="badge step 2000">
+          <div class="progress-meta">
+            <span class="step">step 2000</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_s3000_t.png" alt="badge step 3000">
+          <div class="progress-meta">
+            <span class="step">step 3000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="figure">
+      <div class="chart-title">oneline growing · logged loss</div>
+      <div class="chart-wrap">
+        <img src="neural-cellular-automata/assets/chart_oneline_loss.svg" alt="oneline training loss chart">
+      </div>
+      <div class="caption">loss sat in the 1e-2…5e-3 band while the letters stayed soft · metrics without pixel counts are a trap</div>
+    </div>
+
+    <h3>3 · teach just the word</h3>
+    <p>
+      clearly it was pretty easy to grow a heart and pretty hard to grow a word.
+      this led me to try to split the problem. grow a CA on just the word at low resolution (56×16, grid 88×48).
+      once the letters were crisp and consistent, I would resume those weights onto the full logo.
+    </p>
+
+    <div class="figure">
+      <div class="chart-wrap">
+        <img src="neural-cellular-automata/assets/chart_word_loss.svg" alt="COMPUTER-only training loss chart">
+      </div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-title">COMPUTER-only · early growth</div>
+      <div class="progress-row">
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s0000_t.png" alt="word step 0">
+          <div class="progress-meta">
+            <span class="step">step 0</span>
+            <span class="loss">loss 2.39e-2</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s0500_t.png" alt="word step 500">
+          <div class="progress-meta">
+            <span class="step">step 500</span>
+            <span class="loss">loss 1.07e-2</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s1000_t.png" alt="word step 1000">
+          <div class="progress-meta">
+            <span class="step">step 1000</span>
+            <span class="loss">loss 7.38e-3</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s1500_t.png" alt="word step 1500">
+          <div class="progress-meta">
+            <span class="step">step 1500</span>
+            <span class="loss">loss 6.00e-3</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s2000_t.png" alt="word step 2000">
+          <div class="progress-meta">
+            <span class="step">step 2000</span>
+            <span class="loss">loss 6.69e-3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-title">COMPUTER-only · regenerating (final · step 8000)</div>
+      <div class="progress-row">
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s4000_t.png" alt="step 4000">
+          <div class="progress-meta">
+            <span class="step">step 4000</span>
+            <span class="loss">loss 2.53e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s5000_t.png" alt="step 5000">
+          <div class="progress-meta">
+            <span class="step">step 5000</span>
+            <span class="loss">loss 3.32e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s6000_t.png" alt="step 6000">
+          <div class="progress-meta">
+            <span class="step">step 6000</span>
+            <span class="loss">loss 2.23e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s7000_t.png" alt="step 7000">
+          <div class="progress-meta">
+            <span class="step">step 7000</span>
+            <span class="loss">loss 3.29e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/word_s8000_t.png" alt="step 8000">
+          <div class="progress-meta">
+            <span class="step">step 8000</span>
+            <span class="loss">loss 2.81e-03</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      below are five independent growths from the same seed (80 CA steps, fire 0.5)
+      they all look good so I trust it enough to move on.
+    </p>
+    <div class="figure figure-row">
+      <img src="neural-cellular-automata/assets/word_consistency_row.png" alt="five independent COMPUTER growths side by side">
+      <div class="caption">regenerating @ 8000 · 5/5 · transitions 16 · best 5.78e-04</div>
+    </div>
+
+    <p>
+      NOTE: we actually split this training into generate, stability, and regenerate phases, each is subltly different and I reccomend reading the original paper for the intuition behind each phase.
+    </p>
+
+    <h3>4 · put everything back together</h3>
+    <p>
+      we now added the new learned weights back to one of our original models and resumed training with higher weight given to pixels representing letters (setted on 6x weight).
+    </p>
+
+    <div class="figure">
+      <div class="chart-title">badge · full training loss (growing through regen)</div>
+      <div class="chart-wrap">
+        <img src="neural-cellular-automata/assets/chart_badge_loss.svg" alt="badge training loss chart">
+      </div>
+      <div class="caption">best 2.60e-04 @ step 6 · final regen loss 3.27e-03</div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-title">full badge · regenerating (final · step 8000)</div>
+      <div class="progress-row">
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_final_s0000_t.png" alt="step 0">
+          <div class="progress-meta">
+            <span class="step">step 0</span>
+            <span class="loss">loss 1.25e-02</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_final_s2000_t.png" alt="step 2000">
+          <div class="progress-meta">
+            <span class="step">step 2000</span>
+            <span class="loss">loss 7.13e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_final_s4000_t.png" alt="step 4000">
+          <div class="progress-meta">
+            <span class="step">step 4000</span>
+            <span class="loss">loss 7.25e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_final_s6000_t.png" alt="step 6000">
+          <div class="progress-meta">
+            <span class="step">step 6000</span>
+            <span class="loss">loss 5.09e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/badge_final_s8000_t.png" alt="step 8000">
+          <div class="progress-meta">
+            <span class="step">step 8000</span>
+            <span class="loss">loss 3.27e-03</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>5 · go bigger (still experimenting)</h3>
+    <p>
+      once the small logo worked, I ran the same ladder at higher res: HD word
+      (72×20 on grid 104×52), then HD badge (64×40 on grid 96×72)
+      this is still a work in progress, the challenge on convergence is harder and harder as we try for a bigger more complex pattern
+    </p>
+
+    <div class="progress">
+      <div class="progress-title">HD badge · regenerating (live · step 7000)</div>
+      <div class="progress-row">
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/hd_s3000_t.png" alt="step 3000">
+          <div class="progress-meta">
+            <span class="step">step 3000</span>
+            <span class="loss">loss 1.97e-02</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/hd_s4000_t.png" alt="step 4000">
+          <div class="progress-meta">
+            <span class="step">step 4000</span>
+            <span class="loss">loss 1.46e-02</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/hd_s5000_t.png" alt="step 5000">
+          <div class="progress-meta">
+            <span class="step">step 5000</span>
+            <span class="loss">loss 1.47e-02</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/hd_s6000_t.png" alt="step 6000">
+          <div class="progress-meta">
+            <span class="step">step 6000</span>
+            <span class="loss">loss 9.73e-03</span>
+          </div>
+        </div>
+        <div class="progress-arrow" aria-hidden="true">→</div>
+        <div class="progress-step">
+          <img src="neural-cellular-automata/assets/hd_s7000_t.png" alt="step 7000">
+          <div class="progress-meta">
+            <span class="step">step 7000</span>
+            <span class="loss">loss 9.58e-03</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>conclusion</h2>
+    <p>
+    I set out to make a cool landing page demo for computer club and I think I did.
+    </p>
+    <p>
+    this was much harder than I anticipated it would be, I typically architect and train my own models rather than copying researchers 
+    but this was a fun and interesting process and I learned a considerable ammount.
+    </p>
+    <p>
+    I will continue trying to train a higher fidelity version of the logo for use on the site but for now, my lab notes are complete. I will revise if needed.
+    </p>
+
+    <div class="footer">
+      <h3>thanks for reading!</h3>
+      <a class="back" href="https://ryanhub.org/">&lt;- back to ryanhub</a>
+    </div>
+  </div>
+  <script src="neural-cellular-automata/assets/nca/twgl.min.js"></script>
+  <script type="module" src="neural-cellular-automata/assets/blog-hero.js"></script>
+</body>
+</html>
